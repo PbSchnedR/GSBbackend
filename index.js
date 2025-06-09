@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 const cors = require('cors')
+require('dotenv').config()
 
 app.use(cors({
     origin: '*',
@@ -10,7 +11,7 @@ app.use(cors({
 })) 
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb+srv://pablopoub:rootroot@cluster0.y5ueb.mongodb.net/ngsb')
+mongoose.connect(process.env.URI)
 const db = mongoose.connection
 db.on('error', (err) => {console.log('Error connecting to MongoDB', err)})
 db.on('open', (err) => {console.log('connected to MongoDB')})
