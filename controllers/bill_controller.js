@@ -3,11 +3,12 @@ const {uploadToS3} = require('../utils/s3')
 
 const getBills = async(req,res) => {
     try {
-    const users = await User.find()
-    if(!users || users.length === 0){
-        return res.status(404).json({message: 'No bills found'})
-    }
-    res.status(200).json(users)
+        const {id} = req.user
+        const users = await User.find({user: id})
+        if(!users || users.length === 0){
+            return res.status(404).json({message: 'No bills found'})
+        }
+        res.status(200).json(users)
     /*const {id, role} = req.user
         let bills
         if(role === 'admin'){
