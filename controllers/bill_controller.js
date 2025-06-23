@@ -1,30 +1,30 @@
 const User = require('../models/bill_model')
 const {uploadToS3} = require('../utils/s3')
 
-const getBills = async(req,res) => {
+const getBills = async (req, res, next) => {
     try {
-        const {id} = req.user
-        const users = await User.find({user: id})
-        if(!users || users.length === 0){
-            return res.status(404).json({message: 'No bills found'})
+        const { id } = req.user; // supposé récupéré via middleware auth
+        
+        // Récupérer les notes de frais de l'utilisateur
+        const bills = await User.find({ user: id })
+
+        // Cas où aucune note n'est trouvée
+        if (!bills || bills.length === 0) {
+            return res.status(200).json({
+                message: 'Aucune note de frais trouvée',
+                bills: [],
+            });
         }
-        res.status(200).json(users)
-    /*const {id, role} = req.user
-        let bills
-        if(role === 'admin'){
-            bills = await User.find()
-            return res.json(bills)
-        }
-        else{
-            bills = await User.find({user: id})
-            return res.json(bills)
-        }
-        console.log(req.user)*/
+
+        // Cas succès avec données
+        res.status(200).json({
+            message: 'Notes de frais récupérées avec succès',
+            bills: bills,
+        });
+    } catch (error) {
+        next(error)
     }
-    catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}
+};
 
 const getBillsById = async(req,res) => {
     try{
@@ -37,6 +37,8 @@ const getBillsById = async(req,res) => {
              res.status(500).json({message: error.message})
          }
 }
+
+
 
 const getBillsByUserId = async(req, res) => {
     try {
