@@ -41,7 +41,7 @@ const getUsersById = async(req,res) => {
    
 }
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
     const newUser = req.body;
     try {
         const user = await User.create(newUser);
@@ -50,7 +50,7 @@ const createUser = async (req, res) => {
         if (error.message === 'User already exists') {
             return res.status(409).json({ message: "User already exists" }); // Réponse 2, avec return
         }
-        return res.status(500).json({ message: error.message }); // Réponse 3
+        next(error)
     }
 };
 
