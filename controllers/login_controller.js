@@ -6,52 +6,6 @@ const sha256 = require('js-sha256')
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-/*const handleLogin = async(req,res) => {
-    try {
-        const {email, password} = req.body
-        const user = await User.findOne({email: email, password: password})
-        if(!user){
-            res.status(401).json({message: 'Invalid credentials'})
-        } else {
-
-            const token = jwt.sign(
-                { id: user._id, name: user.name, email: user.email },
-                JWT_SECRET,
-                { expiresIn: '1h' }
-              );
-
-              res.json({token});
-        }
-    }
-    catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}
-
-const authenticateToken = (req, res, next) => {
-    try{
-    const token = req.headers['authorization']?.split(' ')[1];
-  
-    if (!token) {
-      return res.status(401).json({ error: 'Token manquant' });
-    }
-  
-    // Vérifier le token
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(403).json({ error: 'Token invalide' });
-      }
-      // Ajouter les données de l'utilisateur à la requête
-      req.user = user;
-      next(); // Continuer vers la route protégée
-    });
-  }
-    catch (error) {
-        res.status(500).json({message: error.message})
-    }}*/
-
-
-// version de joss :
 
 const isAdmin = (req, res, next) => {
   try{
@@ -89,7 +43,14 @@ const login = async (req, res) => {
   }
 
   const token = jwt.sign({ id: user._id, email: user.email, role: user.role, name: user.name }, JWT_SECRET, { expiresIn: '24h' });
-  res.json({ token });
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false,       // mettre true en HTTPS
+    sameSite: 'Strict',
+    maxAge: 3600000      // 1 heure
+  });
+  res.status(200).json({ message: 'Login successful' });
 
 }
 
@@ -108,11 +69,35 @@ const verifyToken = (req, res, next) =>{
   });
 }
 
+const provideToken = (req, res, next) =>{
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'Non autorisé' });
+
+  try {
+    res.json({ message: 'Bienvenue !', token: token });
+  } 
+  catch (error) {
+    next(error);
+  }
+}
+
+const logout = (req, res) => {
+  res.cookie('token', '', {
+    httpOnly: true,
+    secure: false,       // true en prod avec HTTPS
+    sameSite: 'Strict',
+    maxAge: 0            // expire immédiatement
+  });
+  res.json({ message: 'Déconnecté avec succès' });
+};
+
 
 module.exports = {
     // handleLogin,
    // authenticateToken,
     isAdmin,
     login,
-    verifyToken
+    verifyToken,
+    provideToken,
+    logout
 }
