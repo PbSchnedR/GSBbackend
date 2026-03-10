@@ -3,12 +3,10 @@ const {uploadToS3} = require('../utils/s3')
 
 const getBills = async (req, res, next) => {
     try {
-        const { id } = req.user; // supposé récupéré via middleware auth
+        const { id } = req.user; 
         
-        // Récupérer les notes de frais de l'utilisateur
         const bills = await User.find({ user: id })
 
-        // Cas où aucune note n'est trouvée
         if (!bills || bills.length === 0) {
             return res.status(200).json({
                 message: 'Aucune note de frais trouvée',
@@ -16,7 +14,6 @@ const getBills = async (req, res, next) => {
             });
         }
 
-        // Cas succès avec données
         res.status(200).json({
             message: 'Notes de frais récupérées avec succès',
             bills: bills,

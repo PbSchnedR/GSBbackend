@@ -4,9 +4,9 @@ const storage = multer.memoryStorage()
 
 const fileFilter = (req, file, cb) => {
    if (file.mimetype.startsWith('image/')) {
-       cb(null, true); // Accepter le fichier
+       cb(null, true); 
    }else {
-       cb(new Error('Invalid file type. Only images are allowed.'), false); // Rejeter le fichier
+       cb(new Error('Invalid file type. Only images are allowed.'), false); 
    }
 }
 

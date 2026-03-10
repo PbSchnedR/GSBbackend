@@ -4,27 +4,23 @@ const {uploadToS3} = require('../utils/s3')
 
 const getUsers = async(req,res) => {
     try {
-        // Récupérer tous les utilisateurs
-        // Si un email est fourni dans la requête, filtrer par cet email
         const email = req.query.email ? {email: req.query.email} : {}
         const users = await User.find(email)
         res.json(users)
     }
     catch (error) {
-        res.status(500).json({messagefdp: error.message})
+        res.status(500).json({message: error.message})
     }
 }
 
 const getUsersLength = async(req,res) => {
     try {
-        // Récupérer tous les utilisateurs
-        // Si un email est fourni dans la requête, filtrer par cet email
         const email = req.query.email ? {email: req.query.email} : {}
         const users = await User.find(email)
         res.json(users.length)
     }
     catch (error) {
-        res.status(500).json({messagefdp: error.message})
+        res.status(500).json({message: error.message})
     }
 }
 
@@ -45,10 +41,10 @@ const createUser = async (req, res, next) => {
     const newUser = req.body;
     try {
         const user = await User.create(newUser);
-        return res.status(201).json(user); // Réponse 1
+        return res.status(201).json(user);
     } catch (error) {
         if (error.message === 'User already exists') {
-            return res.status(409).json({ message: "User already exists" }); // Réponse 2, avec return
+            return res.status(409).json({ message: "User already exists" }); 
         }
         next(error)
     }
@@ -87,20 +83,17 @@ const changeUserPassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
 
-        // On cherche l'utilisateur par son ID
         const user = await User.findById(req.params._id);
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Vérifie si l'ancien mot de passe est correct
         const hashedPassword = sha256(currentPassword + 'secret').toString();
         if (user.password !== hashedPassword) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Hachage du nouveau mot de passe
         const newHashedPassword = sha256(newPassword + 'secret').toString();
 
         await User.updateOne({ _id: req.params._id }, { password: newHashedPassword });
@@ -121,7 +114,6 @@ const createAttachment = async (req, res) => {
       return res.status(400).json({ message: 'At least one proof file is required' });
     }
 
-    // Upload tous les fichiers sur S3, récupère leurs URLs et noms corrigés
     const attachments = await Promise.all(
       req.files.map(async (file) => {
         const proofUrl = await uploadToS3(file);
@@ -161,14 +153,12 @@ const getAttachments = async (req, res) => {
     try {
         const { id } = req.user;
 
-        // Récupérer l'utilisateur par ID
         const user = await User.findById(id);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Retourner les pièces jointes de l'utilisateur
         res.status(200).json(user.attachments);
     } catch (error) {
         res.status(500).json({ message: error.message });

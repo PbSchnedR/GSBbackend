@@ -32,10 +32,6 @@ app.use('/api/test', testRoute)
 app.use(errorHandler)
 
 
-app.get('/',(req,res) => {
-    res.send('<h1>site du ghb</h1>')
-})
-
 app.listen(port, () =>{
-    console.log(`frr c'est sur http://127.0.0.1:${port}`)
+    console.log(`http://127.0.0.1:${port}`)
 })

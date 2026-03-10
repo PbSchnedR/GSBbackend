@@ -6,53 +6,6 @@ const sha256 = require('js-sha256')
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-/*const handleLogin = async(req,res) => {
-    try {
-        const {email, password} = req.body
-        const user = await User.findOne({email: email, password: password})
-        if(!user){
-            res.status(401).json({message: 'Invalid credentials'})
-        } else {
-
-            const token = jwt.sign(
-                { id: user._id, name: user.name, email: user.email },
-                JWT_SECRET,
-                { expiresIn: '1h' }
-              );
-
-              res.json({token});
-        }
-    }
-    catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}
-
-const authenticateToken = (req, res, next) => {
-    try{
-    const token = req.headers['authorization']?.split(' ')[1];
-  
-    if (!token) {
-      return res.status(401).json({ error: 'Token manquant' });
-    }
-  
-    // Vérifier le token
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(403).json({ error: 'Token invalide' });
-      }
-      // Ajouter les données de l'utilisateur à la requête
-      req.user = user;
-      next(); // Continuer vers la route protégée
-    });
-  }
-    catch (error) {
-        res.status(500).json({message: error.message})
-    }}*/
-
-
-// version de joss :
-
 const isAdmin = (req, res, next) => {
   try{
     const token = req.headers['authorization']?.split(' ')[1];
@@ -84,7 +37,7 @@ const login = async (req, res) => {
   if(!user){
     return res.status(401).json({ message: 'Invalid credentials' });
   }
-  if(user.password !== sha256(password + 'secret')){ // Remplacez 'secret' par le secret réel
+  if(user.password !== sha256(password + 'secret')){ 
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
