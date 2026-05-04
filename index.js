@@ -27,8 +27,6 @@ app.use('/api/bills', billRoute)
 const loginRoute = require('./routes/login_route')
 app.use('/api/login', loginRoute)
 
-const testRoute = require('./routes/test_route')
-app.use('/api/test', testRoute)
 app.use(errorHandler)
 
 
